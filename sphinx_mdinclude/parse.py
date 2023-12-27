@@ -24,7 +24,14 @@ class RestBlockParser(BlockParser):
         re.DOTALL | re.MULTILINE,
     )
 
-    RULE_NAMES = BlockParser.RULE_NAMES + (
+    SPECIFICATION = BlockParser.SPECIFICATION.copy()
+    SPECIFICATION.update({
+        "directive": DIRECTIVE,
+        "oneline_directive": ONELINE_DIRECTIVE,
+        "rest_code_block": REST_CODE_BLOCK,
+    })
+
+    DEFAULT_RULES = BlockParser.DEFAULT_RULES + (
         "directive",
         "oneline_directive",
         "rest_code_block",
@@ -69,13 +76,22 @@ class RestInlineParser(InlineParser):
         r"(?<!\\)<!\[CDATA[\s\S]+?\]\]>"  # cdata
     )
 
-    RULE_NAMES = (
+    SPECIFICATION = InlineParser.SPECIFICATION.copy()
+    SPECIFICATION.update({
+        "inline_math": INLINE_MATH,
+        "rest_link": REST_LINK,
+        "rest_role": REST_ROLE,
+        "eol_literal_marker": EOL_LITERAL_MARKER,
+        "inline_html": INLINE_HTML,
+    })
+
+    DEFAULT_RULES = (
         "inline_math",
         # "image_link",
         "rest_role",
         "rest_link",
         "eol_literal_marker",
-    ) + InlineParser.RULE_NAMES
+    ) + InlineParser.DEFAULT_RULES
 
     def parse_double_emphasis(self, match: Match, state: State) -> Element:
         # may include code span

@@ -4,8 +4,8 @@ from functools import partial
 
 from docutils.utils import column_width
 from mistune import Markdown
-from mistune.plugins import PLUGINS
-from mistune.renderers import BaseRenderer
+from mistune.plugins import import_plugin
+from mistune.core import BaseRenderer
 
 from .parse import RestBlockParser, RestInlineParser
 
@@ -101,12 +101,13 @@ class RestRenderer(BaseRenderer):
         """Rendering paragraph tags. Like ``<p>``."""
         return "\n" + text + "\n"
 
-    def table(self, body):
+    def table(self, *args):
         """Rendering table element. Wrap header and body in it.
 
         :param header: header part of the table.
         :param body: body part of the table.
         """
+        raise RuntimeError(repr(args))
         table = "\n.. list-table::\n"
         table = table + self._indent_block(body) + "\n"
         return table
@@ -311,7 +312,7 @@ class RestMarkdown(Markdown):
         renderer = renderer or RestRenderer()
         block = block or RestBlockParser()
         inline = inline or RestInlineParser(renderer)
-        plugins = plugins or [PLUGINS[p] for p in DEFAULT_PLUGINS]
+        plugins = plugins or [import_plugin(p) for p in DEFAULT_PLUGINS]
 
         super().__init__(renderer, block=block, inline=inline, plugins=plugins)
 
